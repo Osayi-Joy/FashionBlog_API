@@ -1,12 +1,14 @@
-package com.example.blogapplicationrest.response;
+package com.jconcept.fashionblog.DTO.response;
 
-import com.example.blogapplicationrest.model.Post;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.jconcept.fashionblog.entity.Post;
+import lombok.*;
 
+import javax.persistence.SecondaryTable;
 import java.time.LocalDateTime;
 
-@Data
+@Builder
+@Getter
+@Setter
 @AllArgsConstructor
 public class CreatePostResponse {
 

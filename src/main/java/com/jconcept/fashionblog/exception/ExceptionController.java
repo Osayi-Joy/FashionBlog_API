@@ -1,9 +1,6 @@
-package com.example.blogapplicationrest.controller;
+package com.jconcept.fashionblog.exception;
 
-import com.example.blogapplicationrest.exception.PostAlreadyLikedException;
-import com.example.blogapplicationrest.exception.PostNotFoundException;
-import com.example.blogapplicationrest.exception.UserNotFoundException;
-import com.example.blogapplicationrest.response.ExceptionResponse;
+import com.jconcept.fashionblog.DTO.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +26,10 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage() , HttpStatus.NOT_FOUND);
         return  new ResponseEntity<>(exceptionResponse , HttpStatus.NOT_FOUND);
     }
-
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<Object> postAlreadyLikedException(UserAlreadyExistException exception){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage() , HttpStatus.FORBIDDEN);
+        return  new ResponseEntity<>(exceptionResponse , HttpStatus.FORBIDDEN);
+    }
 
 }

@@ -1,14 +1,15 @@
-package com.example.blogapplicationrest.response;
+package com.jconcept.fashionblog.DTO.response;
 
 
-import com.example.blogapplicationrest.model.Comment;
-import com.example.blogapplicationrest.model.Post;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.jconcept.fashionblog.entity.Comment;
+import com.jconcept.fashionblog.entity.Post;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Builder
+@Getter
+@Setter
 @AllArgsConstructor
 public class CommentResponse {
     private String message;
