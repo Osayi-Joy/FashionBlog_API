@@ -3,8 +3,7 @@ package com.jconcept.fashionblog.services.implementation;
 import com.jconcept.fashionblog.DTO.request.UserLoginRequest;
 import com.jconcept.fashionblog.DTO.request.UserRegisterRequest;
 import com.jconcept.fashionblog.DTO.response.DisplayUsersResponse;
-import com.jconcept.fashionblog.DTO.response.LoginResponse;
-import com.jconcept.fashionblog.DTO.response.UserRegisterResponse;
+import com.jconcept.fashionblog.DTO.response.UserInfoResponse;
 import com.jconcept.fashionblog.entity.Role;
 import com.jconcept.fashionblog.entity.User;
 import com.jconcept.fashionblog.exception.UserAlreadyExistException;
@@ -23,19 +22,19 @@ public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserRegisterResponse registerCustomer(UserRegisterRequest userRegisterRequest) throws UserAlreadyExistException {
+    public UserInfoResponse registerCustomer(UserRegisterRequest userRegisterRequest) {
         User user = register(userRegisterRequest);
         user.setRole(Role.CUSTOMER);
-        userRepository.save(user);
-        return new UserRegisterResponse("success" , LocalDateTime.now() , user);
+        user = userRepository.save(user);
+        return new UserInfoResponse(user.getId(), user.getName(), user.getRole().toString());
     }
 
     @Override
-    public UserRegisterResponse registerDesigner(UserRegisterRequest userRegisterRequest) throws UserAlreadyExistException {
+    public UserInfoResponse registerDesigner(UserRegisterRequest userRegisterRequest) {
         User user = register(userRegisterRequest);
         user.setRole(Role.DESIGNER);
         userRepository.save(user);
-        return new UserRegisterResponse("success" , LocalDateTime.now() , user);
+        return new UserInfoResponse(user.getId(), user.getName(), user.getRole().toString());
     }
 
     private User register(UserRegisterRequest userRegisterRequest) {
@@ -49,28 +48,28 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public LoginResponse login(UserLoginRequest loginRequest) {
-        User guest = findUserByEmail(loginRequest.getEmail());
-        LoginResponse loginResponse = null;
+    public String login(UserLoginRequest loginRequest) {
+        User guest = getUserByEmail(loginRequest.getEmail());
         if (guest != null){
             if (guest.getPassword().equals(loginRequest.getPassword())){
-                loginResponse = new LoginResponse("success" , LocalDateTime.now());
+                return "Login Success";
             }else {
-                loginResponse = new LoginResponse("password MisMatch" , LocalDateTime.now());
+               return "Password Incorrect";
             }
+        }else {
+            throw new UserNotFoundException("User Not Found");
         }
-        return loginResponse;
     }
 
     @Override
-    public User findUserById(Long id){
-        return userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User With ID: " + id + " Not Found "));
+    public String findUserById(Long id){
+        User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User With ID: " + id + " Not Found "));
+        return user.getName();
     }
     @Override
-    public User findUserByEmail(String email){
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isEmpty()) throw new UserNotFoundException("User With email: " + email + " Not Found ");
-        return user.get();
+    public String findUserByEmail(String email){
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User With ID: " + email + " Not Found "));;
+        return user.getName();
     }
 
     @Override
@@ -78,11 +77,16 @@ public class UserServiceImplementation implements UserService {
         if(role.equals("CUSTOMER")){
             List<User> userList = userRepository.findAllByRole(Role.CUSTOMER);
             return new DisplayUsersResponse("success", LocalDateTime.now(), userList);
-        }else {
+        }else if(role.equals("DESIGNER")){
             List<User> userList = userRepository.findAllByRole(Role.DESIGNER);
             return new DisplayUsersResponse("success", LocalDateTime.now(), userList);
+        }else{
+            throw new UserNotFoundException("Role Not Found");
         }
 
+    }
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User With ID: " + email + " Not Found "));
     }
 
 }

@@ -2,66 +2,60 @@ package com.jconcept.fashionblog.controller;
 
 import com.jconcept.fashionblog.DTO.request.CommentRequest;
 import com.jconcept.fashionblog.DTO.request.LikeRequest;
-import com.jconcept.fashionblog.DTO.request.PostRequest;
+import com.jconcept.fashionblog.DTO.request.PostDTO;
 import com.jconcept.fashionblog.DTO.response.*;
 import com.jconcept.fashionblog.entity.Post;
 import com.jconcept.fashionblog.services.PostService;
-import com.jconcept.fashionblog.services.UserService;
+import com.jconcept.fashionblog.util.ApiResponseUtil;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@Slf4j
 @AllArgsConstructor
 @RequestMapping( value = "/api")
 public class PostController {
-//    private final UserService userService;
     private final PostService postService;
+
     @PostMapping(value = "/createPost")
-    public ResponseEntity<CreatePostResponse> createPost(@RequestBody PostRequest postRequest){
-        log.info("Successfully Created A post With Title:  {} " , postRequest.getTitle());
-        return  new ResponseEntity<>(postService.createPost(postRequest) , CREATED);
+    public ResponseEntity<BaseResponse<PostDTO>> createPost(@RequestBody PostDTO postRequest){
+        return ApiResponseUtil.response(CREATED, postService.createPost(postRequest), "New Post");
     }
 
     @PostMapping(value = "/comment/{userId}/{postId}")
-    public ResponseEntity<CommentResponse> comment(@PathVariable(value="userId") Long userId, @PathVariable(value="postId") Long postId, @RequestBody CommentRequest commentRequest){
-        log.info("Successfully commented :  {} " , commentRequest.getComment());
+    public ResponseEntity<BaseResponse<String>> comment(@PathVariable(value="userId") Long userId, @PathVariable(value="postId") Long postId, @RequestBody CommentRequest commentRequest){
         URI uri = URI.create(ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/comment/{userId}/{postId}")
                 .toUriString());
-        return ResponseEntity.created(uri).body(postService.makeAComment(userId , postId , commentRequest));
+        return ApiResponseUtil.response(CREATED, postService.makeAComment(userId , postId , commentRequest), "Commented");
     }
 
-
-
     @PostMapping(value = "/like/{userId}/{postId}")
-    public ResponseEntity<LikeResponse> like(@PathVariable(value = "userId") Long userId, @PathVariable(value = "postId") Long postId, @RequestBody LikeRequest likeRequest){
-        log.info("Successfully liked :  {} " , likeRequest.isLiked());
+    public ResponseEntity<BaseResponse<Integer>> like(@PathVariable(value = "userId") Long userId, @PathVariable(value = "postId") Long postId, @RequestBody LikeRequest likeRequest){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/like").toUriString());
-        return ResponseEntity.created(uri).body(postService.likeAPost(userId , postId , likeRequest));
+        return ApiResponseUtil.response(CREATED, postService.likeAPost(userId , postId , likeRequest), "Liked");
     }
 
     @GetMapping(value = "/searchPost/{keyword}")
-    public ResponseEntity<SearchPostResponse> searchPost(@PathVariable(value = "keyword") String keyword){
-        return new ResponseEntity<>(postService.searchPost(keyword) , OK);
+    public ResponseEntity<BaseResponse<List<PostDTO>>> searchPostUsingKeyword(@PathVariable(value = "keyword") String keyword){
+        return ApiResponseUtil.response(OK, postService.searchPost(keyword), "Found");
     }
 
     @GetMapping(value = "/searchComment/{keyword}")
-    public ResponseEntity<SearchCommentResponse> searchComment(@PathVariable(value = "keyword") String keyword){
-        return ResponseEntity.ok().body(postService.searchComment(keyword));
+    public ResponseEntity<BaseResponse<List<String>>> searchForCommentUsingKeyword(@PathVariable(value = "keyword") String keyword){
+        return ApiResponseUtil.response(OK, postService.searchComment(keyword), "Found");
     }
 
     @GetMapping(value = "/post/{id}")
-    public ResponseEntity<Post> searchComment(@PathVariable(value = "id") Long id){
-        return ResponseEntity.ok().body(postService.findPostById(id));
+    public ResponseEntity<BaseResponse<PostDTO>> searchForPostById(@PathVariable(value = "id") Long id){
+        return ApiResponseUtil.response(OK, postService.getPostById(id), "Found");
     }
 
 }

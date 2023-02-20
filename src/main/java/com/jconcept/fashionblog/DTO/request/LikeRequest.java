@@ -9,5 +9,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LikeRequest {
-    private boolean isLiked;
+    private boolean isLiked = true;
 }

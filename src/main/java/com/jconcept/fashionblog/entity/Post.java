@@ -27,7 +27,6 @@ public class Post {
     private String title ;
     private String description;
     private String featuredImage;
-    private Categories categories;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

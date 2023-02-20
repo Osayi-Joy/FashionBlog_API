@@ -1,35 +1,34 @@
 package com.jconcept.fashionblog.exception;
 
-import com.jconcept.fashionblog.DTO.response.ExceptionResponse;
+import com.jconcept.fashionblog.DTO.response.BaseResponse;
+import com.jconcept.fashionblog.util.ApiResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Object> userNotFoundException(UserNotFoundException exception){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage() , HttpStatus.NOT_FOUND);
-        return  new ResponseEntity<>(exceptionResponse , HttpStatus.NOT_FOUND);
+    public ResponseEntity<BaseResponse> userNotFoundException(UserNotFoundException exception){
+        return ApiResponseUtil.errorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
     @ExceptionHandler(PostAlreadyLikedException.class)
-    public ResponseEntity<Object> postAlreadyLikedException(PostAlreadyLikedException exception){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage() , HttpStatus.FORBIDDEN);
-        return  new ResponseEntity<>(exceptionResponse , HttpStatus.FORBIDDEN);
+    public ResponseEntity<BaseResponse> postAlreadyLikedException(PostAlreadyLikedException exception){
+        return ApiResponseUtil.errorResponse(HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
     @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<Object> postNotFoundException(PostNotFoundException exception){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage() , HttpStatus.NOT_FOUND);
-        return  new ResponseEntity<>(exceptionResponse , HttpStatus.NOT_FOUND);
+    public ResponseEntity<BaseResponse> postNotFoundException(PostNotFoundException exception){
+        return ApiResponseUtil.errorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
+
     @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<Object> postAlreadyLikedException(UserAlreadyExistException exception){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage() , HttpStatus.FORBIDDEN);
-        return  new ResponseEntity<>(exceptionResponse , HttpStatus.FORBIDDEN);
+    public ResponseEntity<BaseResponse> userAlreadyLikedException(UserAlreadyExistException exception){
+        return ApiResponseUtil.errorResponse(HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
 }

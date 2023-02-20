@@ -2,9 +2,12 @@ package com.jconcept.fashionblog.DTO.request;
 
 import lombok.*;
 
-@Builder @AllArgsConstructor @Getter @Setter
+@Builder
+@AllArgsConstructor
+@Getter
+@Setter
 @RequiredArgsConstructor
-public class PostRequest {
+public class PostDTO {
     private String title ;
     private String description;
     private String featuredImage;

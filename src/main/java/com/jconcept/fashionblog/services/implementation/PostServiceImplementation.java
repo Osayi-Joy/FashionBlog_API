@@ -2,8 +2,7 @@ package com.jconcept.fashionblog.services.implementation;
 
 import com.jconcept.fashionblog.DTO.request.CommentRequest;
 import com.jconcept.fashionblog.DTO.request.LikeRequest;
-import com.jconcept.fashionblog.DTO.request.PostRequest;
-import com.jconcept.fashionblog.DTO.response.*;
+import com.jconcept.fashionblog.DTO.request.PostDTO;
 import com.jconcept.fashionblog.entity.*;
 import com.jconcept.fashionblog.exception.PostAlreadyLikedException;
 import com.jconcept.fashionblog.exception.PostNotFoundException;
@@ -17,7 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -35,7 +34,7 @@ public class PostServiceImplementation implements PostService {
 
 
     @Override
-    public CreatePostResponse createPost(PostRequest postRequest) {
+    public PostDTO createPost(PostDTO postRequest) {
 
         Post post = new Post();
         User user = findUserById(postRequest.getUserId());
@@ -50,11 +49,11 @@ public class PostServiceImplementation implements PostService {
         post.setFeaturedImage(postRequest.getFeaturedImage());
         post.setUser(user);
         postRepository.save(post);
-        return new CreatePostResponse("success" , LocalDateTime.now() , post);
+        return new PostDTO(post.getTitle(), post.getDescription(), post.getFeaturedImage(), user.getId());
     }
 
     @Override
-    public CommentResponse makeAComment(Long userId, Long postId, CommentRequest commentRequest) {
+    public String makeAComment(Long userId, Long postId, CommentRequest commentRequest) {
         User user = findUserById(userId);
         Post post = findPostById(postId);
         if(user != null && post != null) {
@@ -63,49 +62,54 @@ public class PostServiceImplementation implements PostService {
             comment.setUser(user);
             comment.setPost(post);
             commentRepository.save(comment);
-            return new CommentResponse("success", LocalDateTime.now(), comment, post);
+            return String.format("Title: %s Description: %s Featured Image: %s Comment: %s ",
+                    post.getTitle(), post.getDescription(), post.getFeaturedImage(), comment.getComment());
         }else {
             throw new PostNotFoundException("User Not Found");
         }
     }
 
     @Override
-    public LikeResponse likeAPost(Long userId, Long postId, LikeRequest likeRequest) {
+    public Integer likeAPost(Long userId, Long postId, LikeRequest likeRequest) {
         Like like = new Like();
+        List<Like> likeList;
         User user = findUserById(userId);
         Post post = findPostById(postId);
-        LikeResponse likeResponse = null;
         Like duplicateLike = likeRepository.findLikeByUserIdAndPostId(userId , postId);
         if (duplicateLike == null){
             like.setLiked(likeRequest.isLiked());
             like.setUser(user);
             like.setPost(post);
             likeRepository.save(like);
-            List<Like> likeList = likeRepository.findAllLikeByPostId(postId);
-            likeResponse = new LikeResponse("success" , LocalDateTime.now() , like , likeList.size());
+            likeList = likeRepository.findAllLikeByPostId(postId);
+            return likeList.size();
         }else {
             likeRepository.delete(duplicateLike);
             throw  new PostAlreadyLikedException("This post has been liked, It is now Unliked :(");
         }
-        return likeResponse;
     }
 
     @Override
-    public SearchCommentResponse searchComment(String keyword) {
-        List<Comment> commentList = commentRepository.findByCommentContaining(keyword);
-        return new SearchCommentResponse("success" , LocalDateTime.now() , commentList);
+    public List<String> searchComment(String keyword) {
+        List<String> comments = new ArrayList<>();
+        for(Comment comment: commentRepository.findByCommentContaining(keyword)){
+            comments.add(comment.getComment());
+        }
+        return comments;
     }
 
     @Override
-    public SearchPostResponse searchPost(String keyword) {
-        List<Post> postList = postRepository.findByTitleContainingIgnoreCase(keyword);
-        return new SearchPostResponse("success" , LocalDateTime.now() , postList);
+    public List<PostDTO> searchPost(String keyword) {
+        List<PostDTO> posts = new ArrayList<>();
+        for(Post post: postRepository.findByTitleContainingIgnoreCase(keyword)){
+            posts.add(new PostDTO(post.getTitle(), post.getDescription(), post.getFeaturedImage(), post.getUser().getId()));
+        }
+        return posts;
     }
 
     public User findUserById(Long id){
         return userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User With ID: " + id + " Not Found "));
     }
-
     public Post findPostById(Long id){
         return postRepository.findById(id).orElseThrow(()-> new PostNotFoundException("Post With ID: " + id + " Not Found "));
     }
@@ -122,5 +126,9 @@ public class PostServiceImplementation implements PostService {
         String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
         String slug = NONLATIN.matcher(normalized).replaceAll("");
         return slug.toLowerCase(Locale.ENGLISH);
+    }
+    public PostDTO getPostById(Long id){
+        Post post = postRepository.findById(id).orElseThrow(()-> new PostNotFoundException("Post With ID: " + id + " Not Found "));
+        return new PostDTO(post.getTitle(), post.getDescription(), post.getFeaturedImage(), post.getUser().getId());
     }
 }

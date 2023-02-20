@@ -1,7 +1,5 @@
 package com.jconcept.fashionblog.entity;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import org.hibernate.annotations.CreationTimestamp;

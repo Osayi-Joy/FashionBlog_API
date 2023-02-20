@@ -2,15 +2,12 @@ package com.jconcept.fashionblog.controller;
 
 import com.jconcept.fashionblog.DTO.request.UserLoginRequest;
 import com.jconcept.fashionblog.DTO.request.UserRegisterRequest;
+import com.jconcept.fashionblog.DTO.response.BaseResponse;
 import com.jconcept.fashionblog.DTO.response.DisplayUsersResponse;
-import com.jconcept.fashionblog.DTO.response.LoginResponse;
-import com.jconcept.fashionblog.DTO.response.UserRegisterResponse;
-import com.jconcept.fashionblog.entity.Post;
-import com.jconcept.fashionblog.entity.Role;
-import com.jconcept.fashionblog.entity.User;
+import com.jconcept.fashionblog.DTO.response.UserInfoResponse;
 import com.jconcept.fashionblog.services.UserService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jconcept.fashionblog.util.ApiResponseUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,46 +15,33 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@Slf4j
+@AllArgsConstructor
 @RequestMapping( value = "/api")
 public class UserController {
     private final UserService userService;
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
 
     @PostMapping(value = "/register-customer")
-    public ResponseEntity<UserRegisterResponse> registerCustomer(@RequestBody UserRegisterRequest userRegisterRequest){
-        log.info("Successfully Registered {} " , userRegisterRequest.getEmail());
-        return new ResponseEntity<>(userService.registerCustomer(userRegisterRequest) , CREATED);
+    public ResponseEntity<BaseResponse<UserInfoResponse>> registerCustomer(@RequestBody UserRegisterRequest userRegisterRequest){
+        return ApiResponseUtil.response(CREATED, userService.registerCustomer(userRegisterRequest), "Successfully Registered");
     }
     @PostMapping(value = "/register-designer")
-    public ResponseEntity<UserRegisterResponse> registerDesigner(@RequestBody UserRegisterRequest userRegisterRequest){
-        log.info("Successfully Registered {} " , userRegisterRequest.getEmail());
-        return new ResponseEntity<>(userService.registerDesigner(userRegisterRequest) , CREATED);
+    public ResponseEntity<BaseResponse<UserInfoResponse>> registerDesigner(@RequestBody UserRegisterRequest userRegisterRequest){
+        return ApiResponseUtil.response(CREATED, userService.registerDesigner(userRegisterRequest), "Successfully Registered");
     }
     @PostMapping(value = "/login")
-    public ResponseEntity<LoginResponse> userLogin(@RequestBody UserLoginRequest loginRequest) {
-        log.info("Welcome! Successfully logged in {} " , loginRequest.getEmail());
-        return new ResponseEntity<>(userService.login(loginRequest), OK);
+    public ResponseEntity<BaseResponse<String>> userLogin(@RequestBody UserLoginRequest loginRequest) {
+        return ApiResponseUtil.response(OK, userService.login(loginRequest), "Successfully Logged In");
     }
 
-//    @GetMapping(value = "/displayUsers/{role}")
-//    public ResponseEntity<DisplayUsersResponse> fetchAllUsers(@PathVariable(value = "role") String role) {
-//        log.info("Welcome! Successfully displayed all Users who are {} ", role);
-//        return new ResponseEntity<>(userService.getAllUserByRole(role), OK);
-//    }
-
     @GetMapping(value = "/users/{id}")
-    public ResponseEntity<User> findUserById(@PathVariable(value = "id") Long id){
-        return ResponseEntity.ok().body(userService.findUserById(id));
+    public ResponseEntity<BaseResponse<String>> findUserById(@PathVariable(value = "id") Long id){
+        return ApiResponseUtil.response(OK, userService.findUserById(id), "Found User");
     }
 
     @GetMapping(value = "/users/email/{email}")
-    public ResponseEntity<User> findUserByEmail(@PathVariable(value="email") String email){
-        return ResponseEntity.ok().body(userService.findUserByEmail(email));
+    public ResponseEntity<BaseResponse<String>> findUserByEmail(@PathVariable(value="email") String email){
+        return ApiResponseUtil.response(OK, userService.findUserByEmail(email), "Found User");
     }
 
     @GetMapping(value = "/users/role")
