@@ -1,4 +1,4 @@
-package com.example.blogapplicationrest.exception;
+package com.jconcept.fashionblog.exception;
 
 import lombok.Getter;
 

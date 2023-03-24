@@ -1,2 +1,12 @@
-package com.jconcept.fashionblog.repository;public interface UserRepository {
+package com.jconcept.fashionblog.repository;
+
+import com.jconcept.fashionblog.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+//    List<User> findAllByRole(RoleEnum role);
 }
