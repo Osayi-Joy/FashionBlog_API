@@ -2,11 +2,13 @@ package com.jconcept.fashionblog.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+
+import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 
@@ -16,16 +18,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "likes")
-public class Like {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Like extends BaseEntity{
     private boolean isLiked;
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     @JsonBackReference
     @ManyToOne

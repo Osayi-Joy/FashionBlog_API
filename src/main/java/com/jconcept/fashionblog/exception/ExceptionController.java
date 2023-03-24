@@ -30,5 +30,9 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
     public ResponseEntity<BaseResponse> userAlreadyLikedException(UserAlreadyExistException exception){
         return ApiResponseUtil.errorResponse(HttpStatus.FORBIDDEN, exception.getMessage());
     }
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<BaseResponse> userAlreadyLikedException(CustomException exception){
+        return ApiResponseUtil.errorResponse(HttpStatus.FORBIDDEN, exception.getMessage());
+    }
 
 }

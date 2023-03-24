@@ -41,9 +41,6 @@ public class PostServiceImplementation implements PostService {
         if(user == null) {
             throw new UserNotFoundException("User Not Found");
         }
-        if(user.getRole().equals(Role.CUSTOMER)){
-            throw new UserNotFoundException("NOT Authorised");
-        }
         post.setTitle(postRequest.getTitle());
         post.setDescription(postRequest.getDescription());
         post.setFeaturedImage(postRequest.getFeaturedImage());

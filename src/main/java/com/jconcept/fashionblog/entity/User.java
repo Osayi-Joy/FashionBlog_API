@@ -1,16 +1,19 @@
 package com.jconcept.fashionblog.entity;
 
+import com.jconcept.fashionblog.enums.Role;
+import jakarta.persistence.*;
 import lombok.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import javax.persistence.*;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Set;
 
 
 @NoArgsConstructor
@@ -19,23 +22,14 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseEntity {
     private String name;
     @Column(unique = true)
     private String email;
     @Enumerated(EnumType.STRING)
     private Role role;
+
     private String password;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
     @JsonManagedReference
     @OneToMany(mappedBy = "user")
     private List<Post> postList = new ArrayList<>();
@@ -47,10 +41,14 @@ public class User {
     @JsonManagedReference
     @OneToMany(mappedBy = "user")
     private List<Like> likeList = new ArrayList<>();
-//    @JsonCreator
-//    public User(@JsonProperty("name")String name, @JsonProperty("email")String email, @JsonProperty("role")Role role) {
-//        this.name = name;
-//        this.email = email;
-//        this.role = role;
-//    }
+
+    public void addRole(Role role) {
+        this.role.getRole();
+    }
+
+    public Set<Role> getRoles() {
+        return Collections.singleton(role);
+    }
+
+
 }

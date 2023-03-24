@@ -9,6 +9,7 @@ import com.jconcept.fashionblog.services.PostService;
 import com.jconcept.fashionblog.util.ApiResponseUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -20,16 +21,18 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping( value = "/api")
+@RequestMapping( value = "/api/post")
 public class PostController {
     private final PostService postService;
 
     @PostMapping(value = "/createPost")
+    @PreAuthorize("hasAuthority('DESIGNER')")
     public ResponseEntity<BaseResponse<PostDTO>> createPost(@RequestBody PostDTO postRequest){
         return ApiResponseUtil.response(CREATED, postService.createPost(postRequest), "New Post");
     }
 
     @PostMapping(value = "/comment/{userId}/{postId}")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<BaseResponse<String>> comment(@PathVariable(value="userId") Long userId, @PathVariable(value="postId") Long postId, @RequestBody CommentRequest commentRequest){
         URI uri = URI.create(ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/comment/{userId}/{postId}")
@@ -38,22 +41,26 @@ public class PostController {
     }
 
     @PostMapping(value = "/like/{userId}/{postId}")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<BaseResponse<Integer>> like(@PathVariable(value = "userId") Long userId, @PathVariable(value = "postId") Long postId, @RequestBody LikeRequest likeRequest){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/like").toUriString());
         return ApiResponseUtil.response(CREATED, postService.likeAPost(userId , postId , likeRequest), "Liked");
     }
 
     @GetMapping(value = "/searchPost/{keyword}")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<BaseResponse<List<PostDTO>>> searchPostUsingKeyword(@PathVariable(value = "keyword") String keyword){
         return ApiResponseUtil.response(OK, postService.searchPost(keyword), "Found");
     }
 
     @GetMapping(value = "/searchComment/{keyword}")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<BaseResponse<List<String>>> searchForCommentUsingKeyword(@PathVariable(value = "keyword") String keyword){
         return ApiResponseUtil.response(OK, postService.searchComment(keyword), "Found");
     }
 
     @GetMapping(value = "/post/{id}")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<BaseResponse<PostDTO>> searchForPostById(@PathVariable(value = "id") Long id){
         return ApiResponseUtil.response(OK, postService.getPostById(id), "Found");
     }

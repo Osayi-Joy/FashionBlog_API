@@ -1,24 +1,28 @@
 package com.jconcept.fashionblog.controller;
 
+import com.jconcept.fashionblog.DTO.request.ForgotPasswordDto;
 import com.jconcept.fashionblog.DTO.request.UserLoginRequest;
 import com.jconcept.fashionblog.DTO.request.UserRegisterRequest;
 import com.jconcept.fashionblog.DTO.response.BaseResponse;
-import com.jconcept.fashionblog.DTO.response.DisplayUsersResponse;
 import com.jconcept.fashionblog.DTO.response.UserInfoResponse;
 import com.jconcept.fashionblog.services.UserService;
 import com.jconcept.fashionblog.util.ApiResponseUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-
+@Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping( value = "/api")
+@RequestMapping( value = "/api/user")
 public class UserController {
     private final UserService userService;
+
+
 
 
     @PostMapping(value = "/register-customer")
@@ -44,8 +48,12 @@ public class UserController {
         return ApiResponseUtil.response(OK, userService.findUserByEmail(email), "Found User");
     }
 
-    @GetMapping(value = "/users/role")
-    public ResponseEntity<DisplayUsersResponse> findUserByRole(@RequestParam String role){
-        return new ResponseEntity<>(userService.getAllUserByRole(role), OK);
-    }
+//    @GetMapping(value = "/users/role")
+//    public ResponseEntity<DisplayUsersResponse> findUserByRole(@RequestParam String role){
+//        return new ResponseEntity<>(userService.getAllUserByRole(role), OK);
+//    }
+
+
+
+
 }
